@@ -3,8 +3,9 @@ package com.game.service;
 import com.game.entity.Player;
 import com.game.entity.Profession;
 import com.game.entity.Race;
-import com.game.repository.PlayerRepository;
+import com.game.repository.IPlayerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -16,9 +17,9 @@ import static java.util.Objects.nonNull;
 
 @Service
 public class PlayerService {
-    private final PlayerRepository playerRepository;
+    private final IPlayerRepository playerRepository;
 
-    public PlayerService(@Autowired PlayerRepository playerRepository) {
+    public PlayerService(@Qualifier("db") @Autowired IPlayerRepository playerRepository) {
         this.playerRepository = playerRepository;
     }
 
@@ -43,7 +44,7 @@ public class PlayerService {
         return playerRepository.save(player);
     }
 
-    public Player updatePlayer(long id, String name, String title, Race race, Profession profession, Boolean banned) {
+    public Player updatePlayer(long id, String name, String title, Race race, Profession profession, long birthday, boolean banned, int level) {
         Player player = playerRepository.findById(id).orElse(null);
         if (isNull(player)) {
             return null;
@@ -67,7 +68,14 @@ public class PlayerService {
             player.setProfession(profession);
             needUpdate = true;
         }
-
+        if (nonNull(level)) {
+            player.setLevel(level);
+            needUpdate = true;
+        }
+        if (nonNull(birthday)) {
+            player.setBirthday(new Date(birthday));
+            needUpdate = true;
+        }
         if (nonNull(banned)) {
             player.setBanned(banned);
             needUpdate = true;

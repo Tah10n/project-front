@@ -67,7 +67,7 @@ public class PlayerController {
         if (nonNull(info.name) && (info.name.length() > 12 || info.name.isEmpty())) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         if (nonNull(info.title) && info.title.length() > 30) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
 
-        Player player = playerService.updatePlayer(id, info.name, info.title, info.race, info.profession, info.banned);
+        Player player = playerService.updatePlayer(id, info.name, info.title, info.race, info.profession, info.birthday, info.banned, info.level);
         if (isNull(player)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         } else {

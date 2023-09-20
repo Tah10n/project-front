@@ -12,8 +12,9 @@ import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
-@Repository
-public class PlayerRepository {
+@Repository(value = "memory")
+public class PlayerRepositoryMemory implements IPlayerRepository {
+
     private static final List<Player> storage = new CopyOnWriteArrayList<Player>() {{
         add(new Player(1L, "Ниус", "Приходящий Без Шума", Race.HOBBIT, Profession.ROGUE, new Date(1244497480000L), false, 33));
         add(new Player(2L, "Никрашш", "НайтВульф", Race.ORC, Profession.WARRIOR, new Date(1152424240000L), false, 58));
@@ -57,6 +58,7 @@ public class PlayerRepository {
         add(new Player(52L, "Аттирис", "и.о.Карвандоса", Race.ELF, Profession.SORCERER, new Date(1245050800000L), true, 34));
     }};
 
+    @Override
     public List<Player> getAll(int pageNumber, int pageSize) {
         return storage.stream()
                 .sorted(Comparator.comparingLong(Player::getId))
@@ -66,24 +68,33 @@ public class PlayerRepository {
 
     }
 
+    @Override
     public int getAllCount() {
         return storage.size();
     }
 
+    @Override
     public Player save(Player player) {
         player.setId(getMaxId() + 1);
         storage.add(player);
         return player;
     }
 
+    @Override
     public Player update(Player player) {
+        long id = player.getId();
+        Player notUpdatedPlayer = findById(id).get();
+        storage.remove(notUpdatedPlayer);
+        storage.add(player);
         return player;
     }
 
+    @Override
     public Optional<Player> findById(long id) {
         return storage.stream().filter(player -> id == player.getId()).findFirst();
     }
 
+    @Override
     public void delete(Player player) {
         storage.remove(player);
     }
@@ -92,6 +103,6 @@ public class PlayerRepository {
         return storage.stream()
                 .map(Player::getId)
                 .max(Long::compareTo)
-                .orElse(1L);
+                .orElse(0L);
     }
 }

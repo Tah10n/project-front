@@ -17,7 +17,8 @@
     <h2>RPG admin panel</h2>
 
     <div>
-        Counts per page:
+
+        <label for="selectPages">Counts per page:</label>
         <select id="selectPages" onchange="showData(0)">
             <option value="3">3</option>
             <option value="5">5</option>
@@ -53,7 +54,7 @@
 
     <form class="form-horizontal">
         <div class="form-group">
-            <label class="col-sm-1 control-label">Name:</label>
+            <label class="col-sm-1 control-label" for="nameInput">Name:</label>
             <div class="col-sm-2">
                 <input class="form-control" id="nameInput" type="text" placeholder="name" required size="1"
                        maxlength="12">
@@ -63,7 +64,7 @@
     </form>
     <form class="form-horizontal">
         <div class="form-group">
-            <label class="col-sm-1 control-label">Title:</label>
+            <label class="col-sm-1 control-label" for="titleInput">Title:</label>
             <div class="col-sm-2">
                 <input class="form-control" id="titleInput" type="text" placeholder="title" required size="1"
                        maxlength="30">
@@ -72,7 +73,7 @@
     </form>
     <form class="form-horizontal">
         <div class="form-group">
-            <label class="col-sm-1 control-label">Race:</label>
+            <label class="col-sm-1 control-label" for="raceInput">Race:</label>
             <div class="col-sm-2">
                 <select class="form-control" id="raceInput">
                     <option value="HUMAN">HUMAN</option>
@@ -88,7 +89,7 @@
     </form>
     <form class="form-horizontal">
         <div class="form-group">
-            <label class="col-sm-1 control-label">Profession:</label>
+            <label class="col-sm-1 control-label" for="professionInput">Profession:</label>
             <div class="col-sm-2">
                 <select class="form-control" id="professionInput">
                     <option value='WARRIOR'>WARRIOR</option>
@@ -105,7 +106,7 @@
     </form>
     <form class="form-horizontal">
         <div class="form-group">
-            <label class="col-sm-1 control-label">Level:</label>
+            <label class="col-sm-1 control-label" for="levelInput">Level:</label>
             <div class="col-sm-2">
                 <input class="form-control" id="levelInput" type="number" min="0" max="100">
             </div>
@@ -113,15 +114,15 @@
     </form>
     <form class="form-horizontal">
         <div class="form-group">
-            <label class="col-sm-1 control-label">Birthday:</label>
+            <label class="col-sm-1 control-label" for="birthdayInput">Birthday:</label>
             <div class="col-sm-2">
-                <input class="form-control" id="birthdayInput" type="date" min="2000-01-01" max="3000-31-12">
+                <input class="form-control" id="birthdayInput" type="date" min="1900-01-01" max="2024-31-12">
             </div>
         </div>
     </form>
     <form class="form-horizontal">
         <div class="form-group">
-            <label class="col-sm-1 control-label">Banned:</label>
+            <label class="col-sm-1 control-label" for="bannedInput">Banned:</label>
             <div class="col-sm-2">
                 <select class="form-control" id="bannedInput">
                     <option value='true'>true</option>
@@ -147,6 +148,9 @@
 
         let totalCounts = getTotalCounts();
         let countsPerPage = $('#selectPages').val();
+        if (countsPerPage === null) {
+            countsPerPage = 3;
+        }
         let pagesCount = Math.ceil(totalCounts / countsPerPage);
 
 
@@ -158,17 +162,16 @@
         $.get(url, function (data) {
             $.each(data, function (i, item) {
                 $('#accountsTable').append(
-                    $('<tr>').html("<td>"
-                        + item.id + "</td><td id='name_" + item.id + "'>"
-                        + item.name + "</td><td id='title_" + item.id + "'>"
-                        + item.title + "</td><td id='race_" + item.id + "'>"
-                        + item.race + "</td><td id='profession_" + item.id + "'>"
-                        + item.profession + "</td><td>"
-                        + item.level + "</td><td>"
-                        + new Date(item.birthday).toLocaleDateString() + "</td><td id='banned_" + item.id + "'>"
-                        + item.banned + "</td><td id='edit_" + item.id + "'>"
-                        + "<button id='button_edit_" + item.id + "' onclick='editAccount(" + item.id + ")'><img src='/img/edit.png'></button></td><td id='delete_" + item.id + "'>"
-                        + "<button id='button_delete_" + item.id + "' onclick='deleteAccount(" + item.id + "," + pageNumber + ")'><img src='/img/delete.png'></button></td>"
+                    $('<tr>').html("<td>" + item.id + "</td>" +
+                        "<td id='name_" + item.id + "'>" + item.name + "</td>" +
+                        "<td id='title_" + item.id + "'>" + item.title + "</td>" +
+                        "<td id='race_" + item.id + "'>" + item.race + "</td>" +
+                        "<td id='profession_" + item.id + "'>" + item.profession + "</td>" +
+                        "<td id='level_" + item.id + "'>" + item.level + "</td>" +
+                        "<td id='birthday_" + item.id + "'>" + new Date(item.birthday).toLocaleDateString() + "</td>" +
+                        "<td id='banned_" + item.id + "'>" + item.banned + "</td>" +
+                        "<td id='edit_" + item.id + "'>" + "<button id='button_edit_" + item.id + "' onclick='editAccount(" + item.id + ")'><img src='/img/edit.png'></button></td>" +
+                        "<td id='delete_" + item.id + "'>" + "<button id='button_delete_" + item.id + "' onclick='deleteAccount(" + item.id + "," + pageNumber + ")'><img src='/img/delete.png'></button></td>"
                     )
                 )
 
@@ -191,12 +194,12 @@
 
             $('.pagination').append(page);
         }
-        // console.log(getCurrentPage());
+        //console.log(getTotalCounts());
     }
 
     function getTotalCounts() {
         let url = "/rest/players/count";
-        let result = 0;
+        let result = 1;
         $.ajax({
             url: url,
             async: false,
@@ -262,6 +265,16 @@
             + "</select>");
         $(profession_id).children().val(currentProfession).change();
 
+        let level_id = "#level_" + id;
+        $(level_id).html("<input type='number' value='" + $(level_id).text() + "'>");
+
+        let birthday_id = "#birthday_" + id;
+        let parts = $(birthday_id).text().split('.');
+        let convertedDate = parts[2] + "-" + parts[1] + "-" + parts[0];
+        $(birthday_id).html("<input type='date' value='" + convertedDate + "'>");
+
+
+
         let banned_id = "#banned_" + id;
         let currentBanned = $(banned_id).text();
         $(banned_id).html("<select>"
@@ -301,10 +314,22 @@
         $(profession_id).children().remove();
         $(profession_id).text(currentProfession).change();
 
+        let level_id = "#level_" + id;
+        let currentLevel = $(level_id).children().val();
+        $(level_id).children().remove();
+        $(level_id).text(currentLevel).change();
+
+        let birthday_id = "#birthday_" + id;
+        let currentBirthday = $(birthday_id).children().val();
+        $(birthday_id).children().remove();
+        $(birthday_id).text(currentBirthday).change();
+
         let banned_id = "#banned_" + id;
         let currentBanned = $(banned_id).children().val();
         $(banned_id).children().remove();
         $(banned_id).text(currentBanned).change();
+
+
 
         let url = "rest/players/" + id;
         $.ajax({
@@ -318,6 +343,8 @@
                 "title": currentTitle,
                 "profession": currentProfession,
                 "race": currentRace,
+                "level": currentLevel,
+                "birthday": new Date(currentBirthday).getTime(),
                 "banned": currentBanned
             }),
             success: function () {
@@ -342,33 +369,48 @@
         let level = $('#levelInput').val();
         let banned = $('#bannedInput').val();
 
-        $.ajax({
-            url: url,
-            type: 'POST',
-            dataType: 'json',
-            contentType: 'application/json;charset=UTF-8',
-            async: false,
-            data: JSON.stringify({
-                "name": name,
-                "title": title,
-                "profession": profession,
-                "race": race,
-                "banned": banned,
-                "level": level,
-                "birthday": new Date(birthday).getTime()
-            }),
-            success: function () {
-                showData(getCurrentPage());
-            }
-        })
+        if (isFormValidated()) {
+            $.ajax({
+                url: url,
+                type: 'POST',
+                dataType: 'json',
+                contentType: 'application/json;charset=UTF-8',
+                async: false,
+                data: JSON.stringify({
+                    "name": name,
+                    "title": title,
+                    "profession": profession,
+                    "race": race,
+                    "banned": banned,
+                    "level": level,
+                    "birthday": new Date(birthday).getTime()
+                }),
+                success: function () {
+                    showData(getCurrentPage());
+                }
+            })
+            name.text("");
+            title.text("");
+            profession.text("");
+            race.text("");
+            birthday.text("");
+            level.text("");
+            banned.text("");
 
-        name.val("");
-        title.val("");
-        profession.val("");
-        race.val("");
-        birthday.val("");
-        level.val("");
-        banned.val("");
+        }
+
+
+    }
+
+    function isFormValidated() {
+        let valid = true;
+
+        if ($('#nameInput').val() == "" || $('#titleInput').val() == "" || $('#levelInput').val() == "" || $('#birthdayInput').val() == "") {
+            alert("Fill all fields");
+            valid = false;
+        }
+
+        return valid;
     }
 
     $('.pagination').css('cursor', 'pointer');
